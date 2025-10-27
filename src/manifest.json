@@ -1,0 +1,54 @@
+{
+  "manifest_version": 3,
+  "name": "Ad Mirror",
+  "version": "0.1.0",
+  "description": "Your private gallery of ads shown to you on Reddit, Google, and Twitter/X.",
+  "permissions": [
+    "storage",
+    "scripting",
+    "offscreen",
+    "downloads"
+  ],
+  "host_permissions": [
+    "https://*.reddit.com/*",
+    "https://www.google.com/*",
+    "https://*.twitter.com/*",
+    "https://*.x.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "src/dashboard/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "src/dashboard/options.html",
+  "content_scripts": [
+    {
+      "matches": ["https://*.reddit.com/*"],
+      "js": ["src/content/reddit.ts"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.google.com/*"],
+      "js": ["src/content/google.ts"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
+      "js": ["src/content/twitter.ts"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
+
