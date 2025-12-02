@@ -4,11 +4,6 @@ import { normalizeCandidate } from '../shared/normalize';
 const OFFSCREEN_DOCUMENT_PATH = 'offscreen/db.html';
 let offscreenReady = false;
 
-// LRU deduplication cache (prevent duplicate processing within 5 min)
-const recentAdIds = new Set<string>();
-const MAX_CACHE_SIZE = 500;
-const CACHE_TTL = 5 * 60 * 1000;
-
 // Ensure offscreen document exists
 async function ensureOffscreenDocument() {
   if (offscreenReady) return;
@@ -28,38 +23,43 @@ async function ensureOffscreenDocument() {
   offscreenReady = true;
 }
 
+// Set up daily retention policy enforcement
+chrome.alarms.create('retention-policy', { periodInMinutes: 24 * 60 }); // Daily
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  if (alarm.name === 'retention-policy') {
+    console.log('[AdMirror] Running daily retention policy');
+    await ensureOffscreenDocument();
+    await chrome.runtime.sendMessage({ type: 'MAINTENANCE_ENFORCE_RETENTION' });
+  }
+});
+
+// Run retention policy on startup
+(async () => {
+  await ensureOffscreenDocument();
+  await chrome.runtime.sendMessage({ type: 'MAINTENANCE_ENFORCE_RETENTION' });
+})();
+
 // Message router
 chrome.runtime.onMessage.addListener((msg: BackgroundMessage, _sender, sendResponse) => {
   (async () => {
     switch (msg.type) {
       case 'AD_CANDIDATE': {
-        const record = await normalizeCandidate(msg.payload);
+        const input = await normalizeCandidate(msg.payload);
         
-        // Dedupe check
-        if (recentAdIds.has(record.id)) {
-          sendResponse({ skipped: true, reason: 'duplicate' });
-          return;
-        }
-        
-        // Add to cache
-        recentAdIds.add(record.id);
-        if (recentAdIds.size > MAX_CACHE_SIZE) {
-          const firstId = recentAdIds.values().next().value;
-          if (firstId) recentAdIds.delete(firstId);
-        }
-        setTimeout(() => recentAdIds.delete(record.id), CACHE_TTL);
-        
-        // Save to DB
+        // Send to offscreen document for storage via AdStore
         await ensureOffscreenDocument();
-        await chrome.runtime.sendMessage({
-          type: 'DB_SAVE',
-          record,
+        const result = await chrome.runtime.sendMessage({
+          type: 'DB_RECORD_IMPRESSION',
+          input,
         });
         
         // Broadcast to popup for live updates
-        chrome.runtime.sendMessage({ type: 'RECORD_SAVED', record }).catch(() => {});
+        if (result.isNew) {
+          chrome.runtime.sendMessage({ type: 'RECORD_SAVED', adId: result.adId }).catch(() => {});
+        }
         
-        sendResponse({ success: true, id: record.id });
+        sendResponse({ success: true, ...result });
         break;
       }
       
@@ -86,18 +86,34 @@ chrome.runtime.onMessage.addListener((msg: BackgroundMessage, _sender, sendRespo
       
       case 'EXPORT': {
         await ensureOffscreenDocument();
-        const { records } = await chrome.runtime.sendMessage({ type: 'DB_LIST' });
+        
+        // Apply filters if provided
+        const filters = msg.filters || {};
+        const { records } = await chrome.runtime.sendMessage({ type: 'DB_LIST', filters });
         
         let blob: Blob;
         let filename: string;
+        const timestamp = new Date().toISOString().split('T')[0];
         
         if (msg.format === 'json') {
           blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
-          filename = `ad-mirror-${Date.now()}.json`;
-        } else {
+          filename = `ad-mirror-${timestamp}.json`;
+        } else if (msg.format === 'csv') {
           const csv = recordsToCSV(records);
           blob = new Blob([csv], { type: 'text/csv' });
-          filename = `ad-mirror-${Date.now()}.csv`;
+          filename = `ad-mirror-${timestamp}.csv`;
+        } else if (msg.format === 'csv-summary') {
+          // Get analytics data for summary
+          const { advertisers } = await chrome.runtime.sendMessage({
+            type: 'ANALYTICS_GET_TOP_ADVERTISERS',
+            opts: { limit: 50 },
+          });
+          const csv = advertiserSummaryToCSV(advertisers, records.length);
+          blob = new Blob([csv], { type: 'text/csv' });
+          filename = `ad-mirror-summary-${timestamp}.csv`;
+        } else {
+          sendResponse({ success: false, error: 'Unknown format' });
+          return;
         }
         
         const url = URL.createObjectURL(blob);
@@ -114,13 +130,31 @@ chrome.runtime.onMessage.addListener((msg: BackgroundMessage, _sender, sendRespo
 function recordsToCSV(records: any[]): string {
   if (!records.length) return 'No records';
   
-  const headers = ['id', 'platform', 'detectedAt', 'advertiserName', 'text', 'destUrl'];
+  const headers = ['id', 'platform', 'firstSeenAt', 'lastSeenAt', 'impressionCount', 'advertiserName', 'creativeText', 'destinationUrl', 'labelText'];
   const rows = records.map(r => headers.map(h => {
-    const val = r[h];
-    if (val === undefined) return '';
+    const val = r[h] || r[h.replace('creativeText', 'text').replace('destinationUrl', 'destUrl').replace('labelText', 'sponsoredLabel')];
+    if (val === undefined || val === null) return '';
+    if (h === 'firstSeenAt' || h === 'lastSeenAt') {
+      return new Date(val).toISOString();
+    }
     if (typeof val === 'string') return `"${val.replace(/"/g, '""')}"`;
     return val;
   }).join(','));
+  
+  return [headers.join(','), ...rows].join('\n');
+}
+
+function advertiserSummaryToCSV(advertisers: any[], totalAds: number): string {
+  const headers = ['Rank', 'Advertiser', 'Total Impressions', 'Unique Ads', 'First Seen', 'Last Seen', '% of Total Ads'];
+  const rows = advertisers.map((adv, index) => [
+    index + 1,
+    `"${adv.advertiserName.replace(/"/g, '""')}"`,
+    adv.impressionCount,
+    adv.adCount,
+    new Date(adv.firstSeenAt).toLocaleDateString(),
+    new Date(adv.lastSeenAt).toLocaleDateString(),
+    `${((adv.adCount / totalAds) * 100).toFixed(2)}%`,
+  ].join(','));
   
   return [headers.join(','), ...rows].join('\n');
 }

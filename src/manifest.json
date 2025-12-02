@@ -1,19 +1,22 @@
 {
   "manifest_version": 3,
   "name": "Ad Mirror",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "description": "Your private gallery of ads shown to you on Reddit, Google, and Twitter/X.",
   "permissions": [
     "storage",
     "scripting",
-    "offscreen",
     "downloads"
+  ],
+  "optional_permissions": [
+    "offscreen"
   ],
   "host_permissions": [
     "https://*.reddit.com/*",
     "https://www.google.com/*",
     "https://*.twitter.com/*",
-    "https://*.x.com/*"
+    "https://*.x.com/*",
+    "https://*.facebook.com/*"
   ],
   "background": {
     "service_worker": "src/background/index.ts",
@@ -31,17 +34,22 @@
   "content_scripts": [
     {
       "matches": ["https://*.reddit.com/*"],
-      "js": ["src/content/reddit.ts"],
+      "js": ["src/content/detectionRegistry.ts"],
       "run_at": "document_idle"
     },
     {
       "matches": ["https://www.google.com/*"],
-      "js": ["src/content/google.ts"],
+      "js": ["src/content/detectionRegistry.ts"],
       "run_at": "document_idle"
     },
     {
       "matches": ["https://*.twitter.com/*", "https://*.x.com/*"],
-      "js": ["src/content/twitter.ts"],
+      "js": ["src/content/detectionRegistry.ts"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://*.facebook.com/*"],
+      "js": ["src/content/detectionRegistry.ts"],
       "run_at": "document_idle"
     }
   ],
@@ -49,6 +57,11 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "ad-mirror@example.com",
+      "strict_min_version": "109.0"
+    }
   }
 }
-
