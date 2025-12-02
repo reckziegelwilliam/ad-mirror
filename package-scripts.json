@@ -1,0 +1,117 @@
+{
+  "name": "ad-mirror",
+  "version": "2.1.0",
+  "description": "Privacy-focused ad detection and archival browser extension",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:chrome": "cross-env TARGET=chrome npm run build",
+    "build:firefox": "cross-env TARGET=firefox npm run build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,json,css,md}\"",
+    "type-check": "tsc --noEmit",
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "jest --testMatch='**/__tests__/**/*.test.ts' --coverage",
+    "test:integration": "jest --testMatch='**/__tests__/**/*.integration.test.ts'",
+    "test:watch": "jest --watch",
+    "test:config-compatibility": "node scripts/test-config-compatibility.js",
+    "validate:configs": "node scripts/validate-configs.js",
+    "security:check": "npm audit --production && snyk test",
+    "benchmark": "node scripts/benchmark-detection.js",
+    "benchmark:compare": "node scripts/compare-benchmarks.js",
+    "metrics:generate": "node scripts/generate-metrics.js",
+    "docs:build": "typedoc src --out docs-build",
+    "prepare": "husky install",
+    "pre-commit": "lint-staged",
+    "pre-push": "npm run type-check && npm run test:unit"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ],
+    "src/content/configs/*.json": [
+      "node scripts/validate-single-config.js"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "pre-push": "npm run type-check && npm test",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "jsdom",
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.test.ts",
+      "**/__tests__/**/*.integration.test.ts"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{ts,tsx}",
+      "!src/**/*.d.ts",
+      "!src/**/__tests__/**",
+      "!src/**/fixtures/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 75,
+        "lines": 80,
+        "statements": 80
+      }
+    },
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/__tests__/setup.ts"
+    ]
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.8",
+    "@types/chrome": "^0.0.254",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.54.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.3",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "^23.0.0",
+    "lint-staged": "^15.1.0",
+    "prettier": "^3.1.0",
+    "snyk": "^1.1269.0",
+    "ts-jest": "^29.1.1",
+    "typedoc": "^0.25.4",
+    "typescript": "^5.3.2",
+    "vite": "^5.0.2",
+    "vite-plugin-web-extension": "^4.1.0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}
+
