@@ -1,7 +1,38 @@
 import { AdRecord, AdCandidatePayload } from './types';
 import { getCurrentSettings } from '../shared/settings';
+import { CreateOrUpdateAdInput } from '../offscreen/adStore';
 
+/**
+ * Convert AdCandidatePayload to CreateOrUpdateAdInput for AdStore
+ */
 export async function normalizeCandidate(
+  payload: AdCandidatePayload
+): Promise<CreateOrUpdateAdInput> {
+  return {
+    platform: payload.platform,
+    platformAdId: await hashId(
+      payload.platform,
+      payload.advertiserName || '',
+      (payload.text || '').substring(0, 160),
+      extractOrigin(payload.destUrl)
+    ),
+    advertiserName: payload.advertiserName,
+    advertiserHandle: payload.advertiserHandle,
+    labelText: payload.sponsoredLabel,
+    creativeText: payload.text?.substring(0, 2000),
+    destinationUrl: payload.destUrl ? sanitizeUrl(payload.destUrl) : undefined,
+    mediaUrls: payload.mediaUrls,
+    pageUrl: payload.pageUrl,
+    placement: payload.placement,
+    seenAt: Date.now(),
+  };
+}
+
+/**
+ * Legacy function for backward compatibility
+ * Converts to old AdRecord format
+ */
+export async function normalizeCandidateLegacy(
   payload: AdCandidatePayload
 ): Promise<AdRecord> {
   const settings = await getCurrentSettings();
@@ -14,14 +45,22 @@ export async function normalizeCandidate(
       extractOrigin(payload.destUrl)
     ),
     platform: payload.platform,
-    detectedAt: Date.now(),
+    firstSeenAt: Date.now(),
+    lastSeenAt: Date.now(),
+    impressionCount: 1,
     placement: payload.placement,
     pageUrl: settings.capturePageUrl ? payload.pageUrl : undefined,
     advertiserName: payload.advertiserName,
     advertiserHandle: payload.advertiserHandle,
-    text: payload.text?.substring(0, 2000),
+    creativeText: payload.text?.substring(0, 2000),
+    labelText: payload.sponsoredLabel,
     mediaUrls: settings.storeMediaUrls ? payload.mediaUrls : undefined,
-    destUrl: payload.destUrl ? sanitizeUrl(payload.destUrl) : undefined,
+    destinationUrl: payload.destUrl ? sanitizeUrl(payload.destUrl) : undefined,
+    tags: [],
+    // Legacy fields
+    detectedAt: Date.now(),
+    text: payload.text,
+    destUrl: payload.destUrl,
     sponsoredLabel: payload.sponsoredLabel,
   };
 }

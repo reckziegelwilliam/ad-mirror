@@ -1,18 +1,26 @@
-export type Platform = 'reddit' | 'google' | 'twitter';
+export type Platform = 'reddit' | 'google' | 'twitter' | 'facebook';
 
 export interface AdRecord {
   id: string;                    // SHA-256 hash of stable fields
   platform: Platform;
-  detectedAt: number;            // Unix timestamp ms
+  firstSeenAt: number;           // Unix timestamp ms - first detection
+  lastSeenAt: number;            // Unix timestamp ms - most recent detection
+  impressionCount: number;       // Number of times seen
   placement: 'feed' | 'search' | 'other';
   pageUrl?: string;              // Excluded by default
   advertiserName?: string;
   advertiserHandle?: string;     // @username for Twitter/Reddit
-  text?: string;                 // Max 2000 chars
+  labelText?: string;            // e.g., "Promoted", "Sponsored"
+  creativeText?: string;         // Ad text content (max 2000 chars)
+  destinationUrl?: string;       // Sanitized (trackers stripped)
   mediaUrls?: string[];          // Empty by default
-  destUrl?: string;              // Sanitized (trackers stripped)
-  sponsoredLabel?: string;       // e.g., "Promoted", "Sponsored"
+  tags?: string[];               // User-defined tags
   transparencyNote?: string;     // Reserved for v1+ (user-triggered capture)
+  // Legacy fields for backward compatibility during migration
+  detectedAt?: number;           // DEPRECATED: use firstSeenAt
+  text?: string;                 // DEPRECATED: use creativeText
+  destUrl?: string;              // DEPRECATED: use destinationUrl
+  sponsoredLabel?: string;       // DEPRECATED: use labelText
 }
 
 export interface Settings {
@@ -20,6 +28,7 @@ export interface Settings {
   capturePageUrl: boolean;       // Default: false
   storeMediaUrls: boolean;       // Default: false
   theme: 'system' | 'light' | 'dark';
+  retentionDays: 90 | 180 | 365 | null;  // null = keep forever
   selectorsOverride?: Partial<SelectorsConfig>;
 }
 
@@ -63,7 +72,7 @@ export type BackgroundMessage =
   | { type: 'LIST_RECORDS'; filters?: RecordFilters }
   | { type: 'DELETE_RECORD'; id: string }
   | { type: 'DELETE_ALL' }
-  | { type: 'EXPORT'; format: 'json' | 'csv' };
+  | { type: 'EXPORT'; format: 'json' | 'csv' | 'csv-summary'; filters?: RecordFilters };
 
 export type PopupMessage =
   | { type: 'RECORD_SAVED'; record: AdRecord }

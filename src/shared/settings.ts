@@ -1,10 +1,11 @@
 import { Settings } from './types';
 
 const DEFAULTS: Settings = {
-  enabledPlatforms: { reddit: true, google: true, twitter: true },
+  enabledPlatforms: { reddit: true, google: true, twitter: true, facebook: false },
   capturePageUrl: false,
   storeMediaUrls: false,
   theme: 'system',
+  retentionDays: 365,  // Keep ads for 1 year by default
 };
 
 export async function getCurrentSettings(): Promise<Settings> {
