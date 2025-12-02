@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Sponsored Results Fixture</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    section { border: 1px solid #ddd; margin: 10px; padding: 10px; }
+    h3 { margin: 8px 0; color: #1a0dab; }
+    cite { color: #006621; font-style: normal; }
+  </style>
+</head>
+<body>
+  <!-- Test Fixture: Google Sponsored Results Section -->
+  <section role="region">
+    <h2>Sponsored</h2>
+    
+    <!-- First sponsored result -->
+    <div>
+      <a href="https://example.com/ad1">
+        <h3>Test Advertiser - Premium Product</h3>
+      </a>
+      <cite>www.example.com</cite>
+      <div data-content-feature="1">
+        This is the description of the first sponsored result. It contains marketing text.
+      </div>
+    </div>
+
+    <!-- Second sponsored result -->
+    <div>
+      <a href="https://another-example.com/campaign">
+        <div role="heading" aria-level="1">Another Sponsored Ad</div>
+      </a>
+      <cite>www.another-example.com</cite>
+      <div>
+        Description for the second ad with different structure.
+      </div>
+    </div>
+  </section>
+
+  <!-- Regular search results (not ads) -->
+  <section>
+    <div>
+      <a href="https://organic-result.com">
+        <h3>Regular Search Result</h3>
+      </a>
+      <cite>www.organic-result.com</cite>
+      <div>
+        This is a regular organic search result, not sponsored.
+      </div>
+    </div>
+  </section>
+
+  <!-- Another sponsored section with alternative markup -->
+  <div data-text-ad="true">
+    <a href="https://test-ad.com">
+      <h3>Sponsored Test Ad</h3>
+    </a>
+    <span>Ad</span>
+    <cite>www.test-ad.com</cite>
+    <div>Ad description goes here.</div>
+  </div>
+</body>
+</html>
+

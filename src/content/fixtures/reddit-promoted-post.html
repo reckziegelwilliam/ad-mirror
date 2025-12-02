@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reddit Promoted Post Fixture</title>
+  <style>
+    /* Minimal styling to simulate Reddit structure */
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .post-container { border: 1px solid #ccc; margin: 10px; padding: 10px; }
+    header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    h3 { margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <!-- Test Fixture: Reddit Promoted Post -->
+  <div data-testid="post-container">
+    <header>
+      <span>Promoted</span>
+      <a href="/user/TestAdvertiser">u/TestAdvertiser</a>
+    </header>
+    <h3>This is a test promoted post headline</h3>
+    <div data-click-id="text">
+      <p>This is the body text of the promoted post. It contains some marketing copy.</p>
+    </div>
+    <a data-click-id="body" href="https://example.com/promoted-link?utm_source=reddit">
+      Learn More
+    </a>
+    <img src="https://example.com/image.jpg" alt="Ad image" />
+  </div>
+
+  <!-- Second promoted post with different structure -->
+  <div data-testid="post-container">
+    <header>
+      <span>Promoted</span>
+      <a href="/r/TestSubreddit">r/TestSubreddit</a>
+    </header>
+    <h3 data-adclicklocation="title">Another promoted post</h3>
+    <div>
+      <p>Different body content here.</p>
+    </div>
+    <a data-adclicklocation="link" href="https://example.com/another-link">
+      Visit Site
+    </a>
+  </div>
+
+  <!-- Regular (non-promoted) post for testing -->
+  <div data-testid="post-container">
+    <header>
+      <a href="/user/RegularUser">u/RegularUser</a>
+    </header>
+    <h3>Regular post without promotion label</h3>
+    <div data-click-id="text">
+      <p>This should NOT be detected as an ad.</p>
+    </div>
+  </div>
+</body>
+</html>
+

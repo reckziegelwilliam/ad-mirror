@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facebook Sponsored Post Fixture</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    [role="article"] { border: 1px solid #ddd; margin: 10px; padding: 15px; background: #fff; }
+    h3 { margin: 8px 0; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <!-- Test Fixture: Facebook Sponsored Post -->
+  <div role="article" data-pagelet="FeedUnit_1">
+    <div>
+      <h3>
+        <a role="link" href="/TestAdvertiser">Test Advertiser</a>
+      </h3>
+      <span aria-label="Sponsored">Sponsored</span>
+    </div>
+    <div data-ad-preview="message" dir="auto" style="text-align: start;">
+      This is a sponsored post on Facebook. Check out our latest products and services!
+    </div>
+    <a href="https://l.facebook.com/l.php?u=https://example.com/fb-ad" role="link">
+      <div role="button">Learn More</div>
+    </a>
+    <img src="https://scontent.fbcdn.net/v/test-image.jpg" alt="Sponsored content" />
+  </div>
+
+  <!-- Second sponsored post with different structure -->
+  <div role="article" data-pagelet="FeedUnit_2">
+    <div>
+      <h4>
+        <span>Another Brand Page</span>
+      </h4>
+      <a aria-label="Sponsored post from Another Brand">Sponsored</a>
+    </div>
+    <div data-ad-comet-preview="message">
+      Different sponsored post structure for testing. Facebook changes their HTML frequently.
+    </div>
+    <a href="https://example-brand.com/promo" role="link">
+      <div role="button">Shop Now</div>
+    </a>
+  </div>
+
+  <!-- Regular post (not sponsored) -->
+  <div role="article">
+    <div>
+      <h3>
+        <a role="link" href="/RegularUser">Regular User</a>
+      </h3>
+    </div>
+    <div dir="auto" style="text-align: start;">
+      This is a regular Facebook post without sponsorship. Should not be detected as an ad.
+    </div>
+  </div>
+
+  <!-- Sponsored post with paid partnership label -->
+  <div role="article" data-ad-preview="true">
+    <div>
+      <strong>
+        <a role="link" aria-label="Influencer Name">Influencer Name</a>
+      </strong>
+      <span>Paid partnership</span>
+    </div>
+    <div dir="auto" style="text-align: start;">
+      Testing paid partnership detection as an alternative to Sponsored label.
+    </div>
+    <a href="https://partner-brand.com" role="link">Visit</a>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitter Promoted Tweet Fixture</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    article { border: 1px solid #ccc; margin: 10px; padding: 15px; border-radius: 8px; }
+    [data-testid="tweetText"] { margin: 10px 0; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <!-- Test Fixture: Twitter/X Promoted Tweet -->
+  <article data-testid="tweet">
+    <div>
+      <span aria-label="Promoted">Promoted</span>
+    </div>
+    <div>
+      <a role="link" href="/TestAdvertiser">
+        <span>Test Advertiser</span>
+      </a>
+      <span>@TestAdvertiser</span>
+    </div>
+    <div data-testid="tweetText" lang="en">
+      This is a promoted tweet with some marketing message. Check out our amazing product!
+    </div>
+    <a href="https://example.com/promoted-tweet-link" role="link" rel="noopener noreferrer nofollow" target="_blank">
+      <div>Learn More</div>
+    </a>
+    <img src="https://pbs.twimg.com/media/example.jpg" alt="Promoted content" />
+  </article>
+
+  <!-- Second promoted tweet with different structure -->
+  <article data-testid="tweet">
+    <div dir="ltr">
+      <span>Promoted</span>
+    </div>
+    <div dir="ltr">
+      <span>
+        <span>Another Brand</span>
+      </span>
+      <a role="link" href="/AnotherBrand">@AnotherBrand</a>
+    </div>
+    <div data-testid="tweetText" dir="auto" lang="en">
+      Another promoted tweet with different HTML structure. Testing fallback selectors.
+    </div>
+    <a data-testid="card.wrapper" href="https://another-brand.com/campaign">
+      <div data-testid="card.layoutLarge.detail">
+        <div>Visit Website</div>
+      </div>
+    </a>
+  </article>
+
+  <!-- Regular tweet (not promoted) -->
+  <article data-testid="tweet">
+    <div>
+      <a role="link" href="/RegularUser">
+        <span>Regular User</span>
+      </a>
+      <span>@RegularUser</span>
+    </div>
+    <div data-testid="tweetText" lang="en">
+      This is a regular tweet without the Promoted label. Should not be detected as an ad.
+    </div>
+  </article>
+
+  <!-- Promoted tweet with article fallback selector -->
+  <article>
+    <div dir="ltr">
+      <span>Ad</span>
+    </div>
+    <div>
+      <a role="link" href="/BrandName">Brand Name</a>
+    </div>
+    <div dir="auto" lang="en">
+      Promoted content using fallback article selector.
+    </div>
+  </article>
+</body>
+</html>
+
