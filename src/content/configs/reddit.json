@@ -1,0 +1,190 @@
+{
+  "platform": "reddit",
+  "version": "2.1.0",
+  "hostnames": ["reddit.com"],
+  "containerScoreThreshold": 0.65,
+  "adaptiveThreshold": true,
+  "containerRules": [
+    {
+      "id": "label-led-promoted",
+      "type": "label-led",
+      "labelTexts": ["Promoted"],
+      "containerSelector": "div[data-testid='post-container'], article, div[data-ad-unit]",
+      "score": 1.0,
+      "excludeSelectors": [
+        "[data-testid='comment']",
+        "[data-testid='comment-tree']",
+        ".comment-container"
+      ],
+      "excludeIfContains": [
+        "replied to",
+        "commented on",
+        "crossposted"
+      ],
+      "excludeAncestors": [
+        "[data-testid='comment']",
+        ".sidebar"
+      ]
+    },
+    {
+      "id": "data-testid-post",
+      "type": "css",
+      "selector": "div[data-testid='post-container']",
+      "score": 0.95,
+      "excludeSelectors": [
+        "[data-testid='comment']"
+      ]
+    },
+    {
+      "id": "data-adclicklocation",
+      "type": "attribute",
+      "attributeKey": "data-adclicklocation",
+      "score": 0.9
+    },
+    {
+      "id": "promoted-tag-fallback",
+      "type": "css",
+      "selector": "div[data-promoted='true'], div[class*='promotedlink']",
+      "score": 0.85,
+      "excludeAncestors": [
+        ".sidebar",
+        "footer"
+      ]
+    }
+  ],
+  "fieldRules": [
+    {
+      "id": "label-promoted-text",
+      "field": "label",
+      "selector": "span:not([class*='icon']):not([aria-hidden])",
+      "score": 1.0
+    },
+    {
+      "id": "advertiser-user-link",
+      "field": "advertiser",
+      "selector": "header a[href*='/user/']",
+      "score": 1.0
+    },
+    {
+      "id": "advertiser-subreddit-fallback",
+      "field": "advertiser",
+      "selector": "header a[href*='/r/']",
+      "score": 0.7
+    },
+    {
+      "id": "advertiser-aria-label",
+      "field": "advertiser",
+      "selector": "a[aria-label*='user'], a[aria-label*='subreddit']",
+      "score": 0.6
+    },
+    {
+      "id": "advertiser-handle-user",
+      "field": "advertiserHandle",
+      "selector": "header a[href*='/user/']",
+      "score": 1.0
+    },
+    {
+      "id": "headline-h3",
+      "field": "headline",
+      "selector": "h3",
+      "score": 1.0
+    },
+    {
+      "id": "headline-data-adclick",
+      "field": "headline",
+      "selector": "[data-adclicklocation='title']",
+      "score": 0.95
+    },
+    {
+      "id": "headline-post-title",
+      "field": "headline",
+      "selector": "[data-testid='post-title']",
+      "score": 0.9
+    },
+    {
+      "id": "body-text-paragraph",
+      "field": "body",
+      "selector": "div[data-click-id='text'] p, div[data-testid='post-content'] p",
+      "score": 0.9
+    },
+    {
+      "id": "body-text-fallback",
+      "field": "body",
+      "selector": "div[class*='RichTextJSON'] p",
+      "score": 0.7
+    },
+    {
+      "id": "destination-body-link",
+      "field": "destinationUrl",
+      "selector": "a[data-click-id='body']",
+      "attr": "href",
+      "score": 1.0,
+      "transform": "url-clean"
+    },
+    {
+      "id": "destination-adclick-link",
+      "field": "destinationUrl",
+      "selector": "a[data-adclicklocation]",
+      "attr": "href",
+      "score": 0.9,
+      "transform": "url-clean"
+    },
+    {
+      "id": "destination-outbound-link",
+      "field": "destinationUrl",
+      "selector": "a[href^='http']",
+      "attr": "href",
+      "score": 0.7,
+      "transform": "url-clean"
+    },
+    {
+      "id": "cta-button-text",
+      "field": "cta",
+      "selector": "button, a[role='button']",
+      "score": 0.8
+    },
+    {
+      "id": "image-post-media",
+      "field": "image",
+      "selector": "img[src]:not([src*='icon']):not([src*='avatar'])",
+      "attr": "src",
+      "score": 1.0
+    },
+    {
+      "id": "video-post-media",
+      "field": "video",
+      "selector": "video source, video",
+      "attr": "src",
+      "score": 1.0
+    }
+  ],
+  "validators": [
+    {
+      "type": "label-pattern",
+      "pattern": "\\b(promoted|sponsored)\\b",
+      "weight": 0.3
+    },
+    {
+      "type": "required-field",
+      "field": "advertiser",
+      "weight": 0.25
+    },
+    {
+      "type": "required-field",
+      "field": "destinationUrl",
+      "weight": 0.25
+    },
+    {
+      "type": "required-field",
+      "field": "headline",
+      "weight": 0.15
+    },
+    {
+      "type": "url-valid",
+      "weight": 0.05
+    }
+  ],
+  "minConfidence": 0.5,
+  "debug": false,
+  "notes": "Reddit promoted posts - v2.1 with negative filters, dynamic thresholds, and context-aware extraction"
+}

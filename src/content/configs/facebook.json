@@ -1,0 +1,143 @@
+{
+  "platform": "facebook",
+  "version": "2.0.0",
+  "hostnames": ["facebook.com"],
+  "containerRules": [
+    {
+      "id": "label-led-sponsored",
+      "type": "label-led",
+      "labelTexts": ["Sponsored", "Paid partnership"],
+      "containerSelector": "div[role='article'], div[data-pagelet*='FeedUnit'], div[class*='story']",
+      "score": 1.0
+    },
+    {
+      "id": "feed-unit-article",
+      "type": "css",
+      "selector": "div[role='article']",
+      "score": 0.9
+    },
+    {
+      "id": "pagelet-feed-story",
+      "type": "attribute",
+      "attributeKey": "data-pagelet",
+      "score": 0.85
+    },
+    {
+      "id": "story-container-fallback",
+      "type": "css",
+      "selector": "div[class*='story_container'], div[data-ad-preview]",
+      "score": 0.8
+    }
+  ],
+  "fieldRules": [
+    {
+      "id": "label-sponsored-text",
+      "field": "label",
+      "selector": "span[aria-label='Sponsored'], a[aria-label*='Sponsored']",
+      "score": 1.0
+    },
+    {
+      "id": "label-sponsored-fallback",
+      "field": "label",
+      "selector": "span, a",
+      "score": 0.7
+    },
+    {
+      "id": "advertiser-page-link",
+      "field": "advertiser",
+      "selector": "h2 a[role='link'], h3 a[role='link'], h4 a[role='link'], strong a[role='link']",
+      "score": 1.0
+    },
+    {
+      "id": "advertiser-heading",
+      "field": "advertiser",
+      "selector": "h2 span, h3 span, h4 span",
+      "score": 0.9
+    },
+    {
+      "id": "advertiser-aria-label",
+      "field": "advertiser",
+      "selector": "a[aria-label]:not([aria-label*='Sponsored'])",
+      "attr": "aria-label",
+      "score": 0.8
+    },
+    {
+      "id": "body-post-text",
+      "field": "body",
+      "selector": "div[data-ad-preview='message'], div[data-ad-comet-preview='message']",
+      "score": 1.0
+    },
+    {
+      "id": "body-text-content",
+      "field": "body",
+      "selector": "div[dir='auto'][style*='text-align']",
+      "score": 0.8
+    },
+    {
+      "id": "destination-external-link",
+      "field": "destinationUrl",
+      "selector": "a[href*='l.facebook.com'], a[href^='http']:not([href*='facebook.com'])",
+      "attr": "href",
+      "score": 1.0,
+      "transform": "url-clean"
+    },
+    {
+      "id": "destination-attachment-link",
+      "field": "destinationUrl",
+      "selector": "a[role='link'][href^='http']",
+      "attr": "href",
+      "score": 0.85,
+      "transform": "url-clean"
+    },
+    {
+      "id": "cta-button",
+      "field": "cta",
+      "selector": "div[role='button'], a[role='button']",
+      "score": 0.9
+    },
+    {
+      "id": "image-attachment",
+      "field": "image",
+      "selector": "img[src*='fbcdn']:not([src*='emoji']):not([src*='avatar'])",
+      "attr": "src",
+      "score": 1.0
+    },
+    {
+      "id": "video-attachment",
+      "field": "video",
+      "selector": "video source, video",
+      "attr": "src",
+      "score": 1.0
+    }
+  ],
+  "validators": [
+    {
+      "type": "label-pattern",
+      "pattern": "\\b(sponsored|paid partnership)\\b",
+      "weight": 0.3
+    },
+    {
+      "type": "required-field",
+      "field": "advertiser",
+      "weight": 0.3
+    },
+    {
+      "type": "required-field",
+      "field": "body",
+      "weight": 0.2
+    },
+    {
+      "type": "min-text-length",
+      "field": "body",
+      "minLength": 5,
+      "weight": 0.15
+    },
+    {
+      "type": "url-valid",
+      "weight": 0.05
+    }
+  ],
+  "minConfidence": 0.5,
+  "debug": false,
+  "notes": "Facebook sponsored posts - v2.0 with layered detection pipeline"
+}

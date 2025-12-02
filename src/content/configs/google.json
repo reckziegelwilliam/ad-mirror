@@ -1,0 +1,134 @@
+{
+  "platform": "google",
+  "version": "2.0.0",
+  "hostnames": ["google.com"],
+  "containerRules": [
+    {
+      "id": "label-led-sponsored",
+      "type": "label-led",
+      "labelTexts": ["Sponsored", "Ad"],
+      "containerSelector": "section, div[role='region'], div[data-text-ad], div.uEierd",
+      "score": 1.0
+    },
+    {
+      "id": "sponsored-section-heading",
+      "type": "css",
+      "selector": "section:has(span:is([aria-label*='Sponsored'], [aria-label*='Ad']))",
+      "score": 0.95
+    },
+    {
+      "id": "text-ad-container",
+      "type": "attribute",
+      "attributeKey": "data-text-ad",
+      "score": 0.9
+    },
+    {
+      "id": "sponsored-class-fallback",
+      "type": "css",
+      "selector": "div.uEierd, div[class*='commercial']",
+      "score": 0.8
+    }
+  ],
+  "fieldRules": [
+    {
+      "id": "label-sponsored-aria",
+      "field": "label",
+      "selector": "span[aria-label*='Sponsored'], span[aria-label*='Ad']",
+      "attr": "aria-label",
+      "score": 1.0
+    },
+    {
+      "id": "label-sponsored-text",
+      "field": "label",
+      "selector": "span, div",
+      "score": 0.8
+    },
+    {
+      "id": "advertiser-title-link",
+      "field": "advertiser",
+      "selector": "a[href^='http'] h3, a[href^='http'] div[role='heading']",
+      "score": 1.0
+    },
+    {
+      "id": "advertiser-cite-domain",
+      "field": "advertiser",
+      "selector": "cite, span[role='text']",
+      "score": 0.9
+    },
+    {
+      "id": "headline-h3",
+      "field": "headline",
+      "selector": "h3, div[role='heading']",
+      "score": 1.0
+    },
+    {
+      "id": "headline-link-text",
+      "field": "headline",
+      "selector": "a[href^='http']",
+      "score": 0.8
+    },
+    {
+      "id": "body-description",
+      "field": "body",
+      "selector": "div[data-content-feature='1'], div[style*='line-clamp']",
+      "score": 0.9
+    },
+    {
+      "id": "body-text-fallback",
+      "field": "body",
+      "selector": "div[role='text'], span[role='text']",
+      "score": 0.7
+    },
+    {
+      "id": "destination-primary-link",
+      "field": "destinationUrl",
+      "selector": "a[href^='http']",
+      "attr": "href",
+      "score": 1.0,
+      "transform": "url-clean"
+    },
+    {
+      "id": "destination-data-url",
+      "field": "destinationUrl",
+      "selector": "a[data-ved]",
+      "attr": "href",
+      "score": 0.9,
+      "transform": "url-clean"
+    },
+    {
+      "id": "cta-link-text",
+      "field": "cta",
+      "selector": "a[role='button'], button",
+      "score": 0.8
+    }
+  ],
+  "validators": [
+    {
+      "type": "label-pattern",
+      "pattern": "\\b(sponsored|ad)\\b",
+      "weight": 0.25
+    },
+    {
+      "type": "required-field",
+      "field": "advertiser",
+      "weight": 0.3
+    },
+    {
+      "type": "required-field",
+      "field": "destinationUrl",
+      "weight": 0.3
+    },
+    {
+      "type": "required-field",
+      "field": "headline",
+      "weight": 0.1
+    },
+    {
+      "type": "url-valid",
+      "weight": 0.05
+    }
+  ],
+  "minConfidence": 0.5,
+  "debug": false,
+  "notes": "Google Search ads - v2.0 with layered detection pipeline"
+}

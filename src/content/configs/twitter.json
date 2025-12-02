@@ -1,0 +1,145 @@
+{
+  "platform": "twitter",
+  "version": "2.0.0",
+  "hostnames": ["twitter.com", "x.com"],
+  "containerRules": [
+    {
+      "id": "label-led-promoted",
+      "type": "label-led",
+      "labelTexts": ["Promoted", "Ad"],
+      "containerSelector": "article[data-testid='tweet'], article, div[data-testid='cellInnerDiv']",
+      "score": 1.0
+    },
+    {
+      "id": "tweet-testid",
+      "type": "css",
+      "selector": "article[data-testid='tweet']",
+      "score": 0.95
+    },
+    {
+      "id": "article-fallback",
+      "type": "css",
+      "selector": "article",
+      "score": 0.85
+    },
+    {
+      "id": "promoted-indicator",
+      "type": "attribute",
+      "attributeKey": "data-promoted",
+      "attributeValue": "true",
+      "score": 0.9
+    }
+  ],
+  "fieldRules": [
+    {
+      "id": "label-promoted-text",
+      "field": "label",
+      "selector": "span[aria-label*='Promoted'], div[dir='ltr'] > span",
+      "score": 1.0
+    },
+    {
+      "id": "advertiser-username-link",
+      "field": "advertiser",
+      "selector": "a[role='link'][href^='/']:not([href*='/status/']):not([href*='/photo/']):not([href*='/video/']) span",
+      "score": 1.0
+    },
+    {
+      "id": "advertiser-display-name",
+      "field": "advertiser",
+      "selector": "div[dir='ltr'] > span > span",
+      "score": 0.9
+    },
+    {
+      "id": "advertiser-aria-link",
+      "field": "advertiser",
+      "selector": "a[aria-label*='profile']",
+      "attr": "aria-label",
+      "score": 0.8
+    },
+    {
+      "id": "advertiser-handle-href",
+      "field": "advertiserHandle",
+      "selector": "a[role='link'][href^='/']:not([href*='/status/']):not([href*='/photo/']):not([href*='/video/'])",
+      "attr": "href",
+      "score": 1.0
+    },
+    {
+      "id": "body-tweet-text",
+      "field": "body",
+      "selector": "div[data-testid='tweetText'], div[lang]",
+      "score": 1.0
+    },
+    {
+      "id": "body-text-fallback",
+      "field": "body",
+      "selector": "div[dir='auto'][lang]",
+      "score": 0.8
+    },
+    {
+      "id": "destination-card-link",
+      "field": "destinationUrl",
+      "selector": "a[href^='http'][role='link'], a[data-testid='card.wrapper']",
+      "attr": "href",
+      "score": 1.0,
+      "transform": "url-clean"
+    },
+    {
+      "id": "destination-external-link",
+      "field": "destinationUrl",
+      "selector": "a[rel='noopener noreferrer nofollow'][target='_blank']",
+      "attr": "href",
+      "score": 0.9,
+      "transform": "url-clean"
+    },
+    {
+      "id": "cta-card-label",
+      "field": "cta",
+      "selector": "div[data-testid='card.layoutLarge.detail'] > div, div[role='button']",
+      "score": 0.8
+    },
+    {
+      "id": "image-media",
+      "field": "image",
+      "selector": "img[src*='pbs.twimg.com']:not([src*='profile']):not([src*='emoji'])",
+      "attr": "src",
+      "score": 1.0
+    },
+    {
+      "id": "video-media",
+      "field": "video",
+      "selector": "video source, video",
+      "attr": "src",
+      "score": 1.0
+    }
+  ],
+  "validators": [
+    {
+      "type": "label-pattern",
+      "pattern": "\\b(promoted|ad)\\b",
+      "weight": 0.3
+    },
+    {
+      "type": "required-field",
+      "field": "advertiser",
+      "weight": 0.25
+    },
+    {
+      "type": "required-field",
+      "field": "body",
+      "weight": 0.25
+    },
+    {
+      "type": "min-text-length",
+      "field": "body",
+      "minLength": 10,
+      "weight": 0.15
+    },
+    {
+      "type": "url-valid",
+      "weight": 0.05
+    }
+  ],
+  "minConfidence": 0.45,
+  "debug": false,
+  "notes": "Twitter/X promoted tweets - v2.0 with layered detection pipeline"
+}
