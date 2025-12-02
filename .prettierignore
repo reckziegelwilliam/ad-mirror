@@ -1,0 +1,16 @@
+# Build outputs
+dist/
+coverage/
+docs-build/
+
+# Dependencies
+node_modules/
+
+# CI/CD artifacts
+benchmark-results.json
+benchmark-baseline.json
+metrics.json
+
+# Lock files (generated)
+package-lock.json
+
